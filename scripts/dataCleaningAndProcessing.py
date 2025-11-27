@@ -7,7 +7,7 @@ Created on Wed Nov 26 14:38:21 2025
 
 import pandas as pd
 
-df = pd.read_csv("hateCrimeData.csv")
+df = pd.read_csv("../data/hateCrimeData.csv")
 
 print(df.head())
 print(df.info())
