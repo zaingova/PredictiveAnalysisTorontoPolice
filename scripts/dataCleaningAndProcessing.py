@@ -7,7 +7,7 @@ Created on Wed Nov 26 14:38:21 2025
 
 import pandas as pd
 
-df = pd.read_csv("../data/hateCrimeData.csv")
+df = pd.read_csv(r"C:\Users\zaing\OneDrive\Desktop\Data Warehousing Project 2\PredictiveAnalysisTorontoPolice\data\hateCrimeData.csv")
 
 print(df.head())
 print(df.info())
@@ -80,3 +80,64 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 corr = df_encoded.corr()['ARREST_MADE'].sort_values(ascending=False)
 print(corr.head(20))
+
+from matplotlib import pyplot as plt
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score, RocCurveDisplay
+
+# Train logistic regression
+log_reg = LogisticRegression(max_iter=500, solver='liblinear')
+log_reg.fit(X_train, y_train)
+
+# Predictions
+y_pred_log = log_reg.predict(X_test)
+y_pred_prob_log = log_reg.predict_proba(X_test)[:, 1]
+
+print("=== Logistic Regression Results ===")
+print(classification_report(y_test, y_pred_log))
+print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred_log))
+print("AUC Score:", roc_auc_score(y_test, y_pred_prob_log))
+
+# ROC Curve
+RocCurveDisplay.from_estimator(log_reg, X_test, y_test)
+plt.title("ROC Curve - Logistic Regression")
+plt.show()
+
+from sklearn.tree import DecisionTreeClassifier
+
+tree = DecisionTreeClassifier(max_depth=6, random_state=42)
+tree.fit(X_train, y_train)
+
+# Predictions
+y_pred_tree = tree.predict(X_test)
+y_pred_prob_tree = tree.predict_proba(X_test)[:, 1]
+
+print("=== Decision Tree Results ===")
+print(classification_report(y_test, y_pred_tree))
+print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred_tree))
+print("AUC Score:", roc_auc_score(y_test, y_pred_prob_tree))
+
+# ROC Curve
+RocCurveDisplay.from_estimator(tree, X_test, y_test)
+plt.title("ROC Curve - Decision Tree")
+plt.show()
+
+from sklearn.metrics import accuracy_score, f1_score
+
+results = pd.DataFrame({
+    "Model": ["Logistic Regression", "Decision Tree"],
+    "Accuracy": [
+        accuracy_score(y_test, y_pred_log),
+        accuracy_score(y_test, y_pred_tree)
+    ],
+    "F1 Score": [
+        f1_score(y_test, y_pred_log),
+        f1_score(y_test, y_pred_tree)
+    ],
+    "AUC": [
+        roc_auc_score(y_test, y_pred_prob_log),
+        roc_auc_score(y_test, y_pred_prob_tree)
+    ]
+})
+
+print(results)
