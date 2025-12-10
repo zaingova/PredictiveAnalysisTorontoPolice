@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toronto Hate Crime Arrest Predictor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔍 Toronto Hate Crime Arrest Predictor</h1>
+            <p class="subtitle">Predict the likelihood of an arrest based on hate crime characteristics</p>
+        </header>
+
+        <div class="card">
+            <form id="predictionForm">
+                <div class="form-group">
+                    <label for="primary_offence">Primary Offence *</label>
+                    <select id="primary_offence" name="primary_offence" required>
+                        <option value="">-- Select Offence Type --</option>
+                        <option value="Assault">Assault</option>
+                        <option value="Assault With a Weapon">Assault With a Weapon</option>
+                        <option value="Assault Causing Bodily Harm">Assault Causing Bodily Harm</option>
+                        <option value="Uttering Threats - Bodily Harm">Uttering Threats - Bodily Harm</option>
+                        <option value="Mischief Under $5000">Mischief Under $5000</option>
+                        <option value="Mischief Over $5000">Mischief Over $5000</option>
+                        <option value="Criminal Harassment">Criminal Harassment</option>
+                        <option value="Public Incitement of Hatred ">Public Incitement of Hatred</option>
+                        <option value="Wilful Promotion of Hatred">Wilful Promotion of Hatred</option>
+                        <option value="Robbery">Robbery</option>
+                        <option value="Arson">Arson</option>
+                        <option value="Sexual Assault">Sexual Assault</option>
+                        <option value="Murder">Murder</option>
+                        <option value="Aggravated Assault">Aggravated Assault</option>
+                        <option value="Mischief To Religious Property, Educational Institutions, Etc.">Mischief To Religious Property</option>
+                        <option value="Harassing Communications">Harassing Communications</option>
+                        <option value="Causing a Disturbance">Causing a Disturbance</option>
+                        <option value="Other Criminal Code Offence Not Listed">Other Offence</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="location_type">Location Type *</label>
+                    <select id="location_type" name="location_type" required>
+                        <option value="">-- Select Location Type --</option>
+                        <option value="Streets/Roadways/Highway">Streets/Roadways/Highway</option>
+                        <option value="House (Townhouse, Retirement Home, Garage, Vehicle, Cottage)">House/Residential</option>
+                        <option value="Apartment Building (Condo, Retirement Buidling, etc.)">Apartment Building</option>
+                        <option value="Business/Retail">Business/Retail</option>
+                        <option value="Educational Institution (Universities, Colleges, Schools, etc.)">Educational Institution</option>
+                        <option value="Religious Place of Worship/Cultural Centre">Religious Place/Cultural Centre</option>
+                        <option value="Open Area, Park or Parking Lot">Open Area/Park/Parking Lot</option>
+                        <option value="Public Transportation">Public Transportation</option>
+                        <option value="Other Commercial / Corporate Places ">Other Commercial</option>
+                        <option value="Government Building">Government Building</option>
+                        <option value="Medical Facility (Hospitals, Long-term Care, etc.)">Medical Facility</option>
+                        <option value="Non-Commercial/Non for Profit">Non-Commercial/Non-Profit</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="neighbourhood">Neighbourhood (Toronto 158) *</label>
+                    <select id="neighbourhood" name="neighbourhood" required>
+                        <option value="">-- Select Neighbourhood --</option>
+                        <option value="Yorkdale-Glen Park (31)">Yorkdale-Glen Park (31)</option>
+                        <option value="Church-Wellesley (167)">Church-Wellesley (167)</option>
+                        <option value="St Lawrence-East Bayfront-The Islands (166)">St Lawrence-East Bayfront (166)</option>
+                        <option value="Downtown Yonge East (168)">Downtown Yonge East (168)</option>
+                        <option value="Bay Street Corridor (76)">Bay Street Corridor (76)</option>
+                        <option value="Kensington-Chinatown (78)">Kensington-Chinatown (78)</option>
+                        <option value="University (79)">University (79)</option>
+                        <option value="Waterfront Communities-The Island (77)">Waterfront Communities (77)</option>
+                        <option value="Annex (95)">Annex (95)</option>
+                        <option value="Yonge-Eglinton (100)">Yonge-Eglinton (100)</option>
+                        <option value="Mount Pleasant East (99)">Mount Pleasant East (99)</option>
+                        <option value="North St.James Town (74)">North St.James Town (74)</option>
+                        <option value="Moss Park (73)">Moss Park (73)</option>
+                        <option value="Rosedale-Moore Park (98)">Rosedale-Moore Park (98)</option>
+                        <option value="Dovercourt-Wallace Emerson-Junction (93)">Dovercourt-Wallace (93)</option>
+                        <option value="Other">Other Neighbourhood</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="religion_bias">Religion Bias</label>
+                    <select id="religion_bias" name="religion_bias">
+                        <option value="Not specified">Not Specified/Unknown</option>
+                        <option value="Muslim">Muslim</option>
+                        <option value="Jewish">Jewish</option>
+                        <option value="Catholic">Catholic</option>
+                        <option value="Sikh">Sikh</option>
+                        <option value="Hindu">Hindu</option>
+                        <option value="Buddhist">Buddhist</option>
+                        <option value="Anglican">Anglican</option>
+                        <option value="Christian Orthodox">Christian Orthodox</option>
+                        <option value="Other Christian Religion">Other Christian Religion</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-primary">Predict Arrest Likelihood</button>
+            </form>
+        </div>
+
+        <div id="results" class="results-container" style="display: none;">
+            <h2>Prediction Results</h2>
+            
+            <div class="result-card">
+                <h3>🤖 Logistic Regression Model</h3>
+                <div class="prediction-result">
+                    <div class="prediction-label">Arrest Prediction:</div>
+                    <div class="prediction-value" id="log-reg-prediction"></div>
+                </div>
+                <div class="probability-bar">
+                    <div class="probability-label">Arrest Probability:</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="log-reg-probability-bar"></div>
+                    </div>
+                    <div class="probability-text" id="log-reg-probability"></div>
+                </div>
+                <div class="model-accuracy">Model Accuracy: 80.3%</div>
+            </div>
+
+            <div class="result-card">
+                <h3>🌳 Decision Tree Model</h3>
+                <div class="prediction-result">
+                    <div class="prediction-label">Arrest Prediction:</div>
+                    <div class="prediction-value" id="tree-prediction"></div>
+                </div>
+                <div class="probability-bar">
+                    <div class="probability-label">Arrest Probability:</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="tree-probability-bar"></div>
+                    </div>
+                    <div class="probability-text" id="tree-probability"></div>
+                </div>
+                <div class="model-accuracy">Model Accuracy: 77.6%</div>
+            </div>
+        </div>
+
+        <div id="error" class="error-message" style="display: none;"></div>
+
+        <footer>
+            <p>⚠️ This tool is for educational and analytical purposes only. Predictions are based on historical Toronto Police data.</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

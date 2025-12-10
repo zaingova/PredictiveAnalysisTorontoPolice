@@ -6,8 +6,14 @@ Created on Wed Nov 26 14:38:21 2025
 """
 
 import pandas as pd
+import os
 
-df = pd.read_csv(r"C:\Users\zaing\OneDrive\Desktop\Data Warehousing Project 2\PredictiveAnalysisTorontoPolice\data\hateCrimeData.csv")
+# Get the correct path relative to the script location
+script_dir = os.path.dirname(os.path.abspath(__file__))
+project_dir = os.path.dirname(script_dir)
+data_path = os.path.join(project_dir, 'data', 'hateCrimeData.csv')
+
+df = pd.read_csv(data_path)
 
 print(df.head())
 print(df.info())
@@ -141,3 +147,15 @@ results = pd.DataFrame({
 })
 
 print(results)
+
+# Save models and feature information for deployment
+import joblib
+
+models_dir = os.path.join(project_dir, 'models')
+os.makedirs(models_dir, exist_ok=True)
+
+joblib.dump(log_reg, os.path.join(models_dir, 'logistic_regression_model.pkl'))
+joblib.dump(tree, os.path.join(models_dir, 'decision_tree_model.pkl'))
+joblib.dump(X.columns.tolist(), os.path.join(models_dir, 'feature_names.pkl'))
+
+print("\nModels saved successfully!")
